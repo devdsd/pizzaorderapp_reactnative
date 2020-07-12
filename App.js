@@ -1,91 +1,58 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, FlatList, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import Header from './src/components/Header';
+import PizzaOrderLists from './src/components/PizzaOrderLists';
+import PizzaOrderForms from './src/components/PizzaOrderForms';
 
-// jsx templates
 export default function App() {
 
-  // const [name, setName] = useState('Diether');
-  // const [age, setAge] = useState(22);
-  const [people, setPeople] = useState([
-    {name: 'Dummy1', id: '1'},
-    {name: 'Dummy2', id: '2'},
-    {name: 'Dummy3', id: '3'},
-    {name: 'Dummy4', id: '4'},
-    {name: 'Dummy5', id: '5'},
-    {name: 'Dummy6', id: '6'},
-    {name: 'Dummy7', id: '7'}
-    
-  ]);
+  const [isLoading, setLoading] = useState(true);
+  const [pizzas, setPizza] = useState([]);
 
-  // const clickHandler = () => {
-  //   setName('DevDSD');
-  //   setAge(25);
-  // }
+  useEffect(() => {
+    fetch('http://192.168.1.11/api/pizzas')
+      .then((response) => response.json())
+      .then((response) => setPizza(response.data))
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const pressHandler = (id) => {
-    // console.log(id);
-    setPeople((prevPeople) => {
-      return prevPeople.filter(person => person.id != id);
-    });
-  }
 
   return (
     <View style={styles.container}>
-        
-        {/* FlatList (Another way to implement List of Items) */}
-      <FlatList
-        numColumns={2}
-        keyExtractor={(item) => item.id}
-        data={people}
-        renderItem={ ({ item }) => {
-          return (
-            <TouchableOpacity onPress={() => pressHandler(item.id)}>
-              <Text style={styles.item}> {item.name} </Text>
-            </TouchableOpacity>
-          )
-        }}
-        />
-        
-        
-        {/* List and ScrollView */}
-      {/* <Text>List and ScrollView</Text>
-      <ScrollView>
-        { people.map( (item) => {
-          return (
-            <View key={item.key}>
-              <Text style={styles.item}> {item.name} </Text>
-            </View>
-          )
-        })}
-      </ScrollView> */}
+    <TouchableWithoutFeedback onPress={() => {
+      Keyboard.dismiss();
+    }}>
+      <View style={styles.container}>
+                    {/**Header */}
+          <Header />
+          <View style={styles.content}>
 
-      {/* <View style={styles.header}>
-        <Text> Header </Text>
-      </View> */}
+                    {/**Pizza Order Form */}
+              <View style={styles.orderPizza}>
+                  <PizzaOrderForms />
+              </View>
+              
+                  {/** Pizza Order Items */}
+              <Text style={{textAlign: 'center', fontWeight: 'bold', fontSize: 20, marginTop: 15 }}>
+                PIZZA ORDERS
+              </Text>
+              
+              <View style={styles.list}>
+                <FlatList
+                  keyExtractor={({ id }) => id.toString()}
+                  data={pizzas}
+                  renderItem={({ item }) => (
+                    <PizzaOrderLists item={item} />
+                  )}
+                />
+              </View>
 
-          {/* Testing <TextInput> Tag */}
-      {/* <Text> Enter Name: </Text>
-      <TextInput 
-          multiline
-          style={styles.inputName}
-          placeholder='e.g John Doe'
-          onChangeText = {(val) => setName(val)} />
-
-      <Text> Enter Age: </Text>
-      <TextInput 
-          keyboardType='numeric'
-          style={styles.inputAge}
-          placeholder='e.g 99'
-          onChangeText = {(val) => setAge(val)} />
-      <Text> Name: {name}, Age: {age} </Text> */}
-                  {/*           */}
-
-      {/* <View style={styles.buttonContainer}>
-        <Button title="Update State" onPress={clickHandler} />
-      </View> */}
-
-      {/* <StatusBar style="auto" /> */}
+          </View>
+      </View>
+    </TouchableWithoutFeedback>
+    <StatusBar style="light" />
     </View>
   );
 }
@@ -94,41 +61,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    paddingTop: 40,
-    paddingHorizontal: 20
   },
-  header: {
-    backgroundColor: '#ff5733',
-    padding: 3,
+  content: {
+    flex: 1,
+    padding:40,
   },
-  boldText: {
-    fontWeight: 'bold'
-  },
-  buttonContainer: {
-    marginTop: 5,
-  },
-  inputName: {
-    borderWidth: 1,
-    padding: 5,
-    margin: 5,
-    width: 200,
-    borderColor: '#777'
-  },
-  inputAge: {
-    borderWidth: 1,
-    padding: 5,
-    margin: 5,
-    width: 200,
-    borderColor: '#777'
-  },
-  item: {
+  list: {
+    flex: 1,
     marginTop: 10,
-    marginHorizontal: 10,
-    padding: 10,
-    backgroundColor: 'teal',
-    fontSize: 25
   }
 
 });
