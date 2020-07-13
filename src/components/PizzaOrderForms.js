@@ -1,25 +1,38 @@
 import React, { useState } from 'react';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input } from 'react-native-elements';
 import { View, Text, Picker, Button } from 'react-native';
 
 
-export default function PizzaOrderForms() {
-    const [selectedValue, setSelectedValue] = useState("Garlic Pizza");
+export default function PizzaOrderForms({ addPizza }) {
+    const [typeValue, setTypeValue] = useState("");
+    const [crustValue, setCrustValue] = useState("");
+    const [customer_name, setCustomerName] = useState("");
+
+    const inputHandler = (val) => {
+        setCustomerName(val);
+    }
+    
+
+    const pizzaHandler = (customer_name, typeValue, crustValue) => {
+        let pizza = {customer_name: customer_name, type: typeValue, crust: crustValue};
+        addPizza(pizza);
+        setCustomerName("");
+    }
 
 
     return (
         <View>
             <Text style={{marginBottom: 5, fontSize: 15, fontWeight: 'bold'}}> Customer Name: </Text> 
             <Input
-            placeholder='Please input a name..'
+                onChangeText={inputHandler}
+                placeholder='Please input a name..'
             />
 
             <Text style={{marginBottom: 5, fontSize: 15, fontWeight: 'bold'}}> Pizza Type: </Text>
             <Picker
-                selectedValue={selectedValue}
+                selectedValue={typeValue}
                 style={{ height: 50, width: 200, marginLeft:20, borderStyle: 'dashed' }}
-                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)} >
+                onValueChange={(itemValue, itemIndex) => setTypeValue(itemValue)} >
                 
                     <Picker.Item label="Garlic Pizza" value="Garlic Pizza" />
                     <Picker.Item label="Hawaiian" value="Hawaiian" />
@@ -34,9 +47,9 @@ export default function PizzaOrderForms() {
 
             <Text style={{marginBottom: 5, fontSize: 15, fontWeight: 'bold'}}> Pizza Crust: </Text>
             <Picker
-                selectedValue={selectedValue}
+                selectedValue={crustValue}
                 style={{ height: 50, width: 200, marginLeft:20, borderStyle: 'dashed' }}
-                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)} >
+                onValueChange={(itemValue, itemIndex) => setCrustValue(itemValue)} >
                 
                     <Picker.Item label="Chessy Crust" value="Chessy" />
                     <Picker.Item label="Thin Crust" value="Thin" />
@@ -46,7 +59,9 @@ export default function PizzaOrderForms() {
 
             </Picker>
 
-            <Button title="Order!" />
+            <Button 
+                onPress={() =>  pizzaHandler(customer_name, typeValue, crustValue)}
+                title="Order!" />
 
         </View>
     )
